@@ -1,4 +1,5 @@
 from rest_framework import serializers
+from .models import Event
 from django.contrib.auth import get_user_model, authenticate
 
 User = get_user_model()
@@ -29,6 +30,13 @@ class LoginSerializer(serializers.Serializer):
         if user and user.is_active:
             return user
         raise serializers.ValidationError('Invalid credentials')
+    
+class EventSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Event
+        fields = ['id','title','description','date','time','location', 'created_by']
+        read_only_fields = ['created_by']
+
     
 
  
