@@ -16,16 +16,6 @@ class EventAPITestCase(APITestCase):
             name = "Test User",
             role = "manager",
         )
-        # self.event =  Event.objects.create(
-        #     title = "Event 2",
-        #     description = "Description of the event",
-        #     date ="2023-09-30T10:00:00Z",
-        #     time = "15:00:00",
-        #     location="Bangalore",
-        #     total_tickets = 50,
-        #     tickets_sold =10,
-        #     created_by = self.user
-        # )
 
         Event.objects.create(
             title = "Event 1",
