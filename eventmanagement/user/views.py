@@ -6,7 +6,8 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from .models import User,Event, Booking
 from django.contrib.auth import get_user_model
 from .permission import IsManager
-from .serializers import RegisterSerilaizer,LoginSerializer, EventSerializer
+from django.utils.dateparse import parse_date
+from .serializers import RegisterSerilaizer,LoginSerializer, EventSerializer, BookingSerializer
 
 # Create your views here.
 
@@ -100,7 +101,6 @@ def delete_event(request,event_id):
 def get_events(request):
     try:
         events = Event.objects.all()
-        print("Called get events")
         serializer = EventSerializer(events, many= True)
         return Response(serializer.data,status= status.HTTP_200_OK)
     except Event.DoesNotExist:
@@ -156,5 +156,48 @@ def event_detail(request, event_id):
      }
     return Response(event_data,status=status.HTTP_200_OK)
 
-        
-        
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def my_bookings(request):
+    bookings = Booking.objects.filter(user=request.user)
+    
+    if not bookings.exists():
+        return Response({"message":"You have no bookings"},status=status.HTTP_200_OK)
+    
+    serializer = BookingSerializer(bookings,many=True)
+    return Response(serializer.data,status=status.HTTP_200_OK) 
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def filter_events(request):
+    events = Event.objects.all()
+    location = request.query_params.get('location',None)
+    if location:
+        events = events.filter(location__icontains=location)
+    
+    category = request.query_params.get('category',None)
+    if category:
+        events = events.filter(category__icontains=category)
+
+    date_str = request.query_params.get('date',None)
+    if date_str:
+        try:
+            event_date = parse_date(date_str)
+            events = events.filter(date=event_date)
+        except ValueError:
+            return Response({'error':"Invalid date formed use formar YYYY-MM-DD"}, status=status.HTTP_400_BAD_REQUEST)
+    
+    serializer = EventSerializer(events,many=True)
+    return Response(serializer.data,status=status.HTTP_200_OK) 
+
+@api_view(['GET'])
+@permission_classes([IsManager])
+def my_events(request):
+    events = Event.objects.filter(created_by=request.user)
+    
+    if not events.exists():
+        return Response({"message":"You have no events create"},status=status.HTTP_200_OK)
+    
+    serializer = EventSerializer(events,many=True)
+    return Response(serializer.data,status=status.HTTP_200_OK) 
+    

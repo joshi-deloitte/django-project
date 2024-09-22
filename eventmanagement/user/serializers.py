@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Event
+from .models import Event, Booking
 from django.contrib.auth import get_user_model, authenticate
 
 User = get_user_model()
@@ -37,6 +37,8 @@ class EventSerializer(serializers.ModelSerializer):
         fields = ['id','title','description','date','time','location','total_tickets','tickets_sold','tickets_available','created_by','category']
         read_only_fields = ['created_by','tickets_available']
 
-    
-
+class BookingSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Booking
+        fields = ['user','event','number_of_tickets','booking_date']
  
