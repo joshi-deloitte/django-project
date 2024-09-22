@@ -4,7 +4,7 @@ from .views import register, get_users,login, logout, create_event, edit_event, 
 
 urlpatterns = [
     path('register/',register,name='register' ),
-    path('dummy/', get_users),
+    path('get_users/', get_users, name ='get_users'),
     path('login/', login, name= 'login'),
     path('logout/', logout, name= 'logout'),
     path('create_event/', create_event, name= 'create_event'),

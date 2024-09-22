@@ -35,13 +35,11 @@ class User(AbstractBaseUser, PermissionsMixin):
     USERNAME_FIELD = 'email'
     REQUIRED_FILEDS = ['name']
 
-    def __str__(self):
-        return self.email
     
 class Event(models.Model):
     title = models.CharField(max_length =255)
     description = models.TextField()
-    date = models.DateField()
+    date = models.DateTimeField()
     time = models.TimeField()
     location = models.CharField(max_length=255)
     total_tickets = models.PositiveIntegerField()

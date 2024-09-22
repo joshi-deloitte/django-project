@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Event, Booking
+from .models import Event, Booking, User
 from django.contrib.auth import get_user_model, authenticate
 
 User = get_user_model()
@@ -30,6 +30,11 @@ class LoginSerializer(serializers.Serializer):
         if user and user.is_active:
             return user
         raise serializers.ValidationError('Invalid credentials')
+    
+class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['email','username','name','role']
     
 class EventSerializer(serializers.ModelSerializer):
     class Meta:

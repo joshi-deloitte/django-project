@@ -7,7 +7,7 @@ from .models import User,Event, Booking
 from django.contrib.auth import get_user_model
 from .permission import IsManager
 from django.utils.dateparse import parse_date
-from .serializers import RegisterSerilaizer,LoginSerializer, EventSerializer, BookingSerializer
+from .serializers import RegisterSerilaizer,LoginSerializer, EventSerializer, BookingSerializer, UserSerializer
 
 # Create your views here.
 
@@ -24,9 +24,16 @@ def register(request):
         return Response(serializer.errors,status = status.HTTP_400_BAD_REQUEST)
 
 @api_view(['GET'])
+@permission_classes([IsManager])
 def get_users(request):
     if request.method == 'GET':
-        return Response(User.objects.all()[1].password)
+        try:
+            users = User.objects.all()
+            serializer = UserSerializer(users, many= True)
+            return Response(serializer.data,status= status.HTTP_200_OK)
+        except User.DoesNotExist:
+            return Response({"error": "No users Found"},status=status.HTTP_400_BAD_REQUEST)
+        
     
 @api_view(['POST'])
 @permission_classes([AllowAny])
@@ -53,7 +60,6 @@ def logout(request):
         refresh_token = request.data.get("refresh_token")
         token = RefreshToken(refresh_token)
         token.blacklist()
-        print(request.user.is_authenticated)
         return Response({"message: successfully logged out"}, status= status.HTTP_200_OK)
     except Exception as e:
         return Response({"error":str(e)},status = status.HTTP_400_BAD_REQUEST)
@@ -62,6 +68,8 @@ def logout(request):
 @api_view(['POST'])
 @permission_classes([IsManager])
 def create_event(request):
+    data = request.data.copy()
+    data['created_by']= request.user.id
     serializer = EventSerializer(data=request.data)
     if serializer.is_valid():
         if request.user.is_authenticated:
