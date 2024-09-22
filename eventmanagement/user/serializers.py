@@ -34,8 +34,8 @@ class LoginSerializer(serializers.Serializer):
 class EventSerializer(serializers.ModelSerializer):
     class Meta:
         model = Event
-        fields = ['id','title','description','date','time','location', 'created_by']
-        read_only_fields = ['created_by']
+        fields = ['id','title','description','date','time','location','total_tickets','tickets_sold','tickets_available','created_by','category']
+        read_only_fields = ['created_by','tickets_available']
 
     
 
